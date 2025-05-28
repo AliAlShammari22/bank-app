@@ -1,17 +1,36 @@
-// Profile.tsx
-import { me } from "@/api/auth";
-import { useQuery } from "@tanstack/react-query";
-import React from "react";
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
+import { me, updateProfile } from "@/api/auth";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Profile() {
+  const [image, setImage] = useState<string | null>(null);
   const { data, isLoading, error } = useQuery({
     queryKey: ["profile"],
     queryFn: me,
   });
 
+  const { mutate } = useMutation({
+    mutationKey: ["updateProfile"],
+    mutationFn: () => updateProfile(image || ""),
+    onSuccess: () => {
+      alert("Profile Image Updated");
+    },
+  });
+
   //   console.log(data);
 
+  const hanldeUpdateProfile = () => {
+    mutate();
+  };
   if (isLoading) {
     return (
       <View style={styles.loaderContainer}>
@@ -26,9 +45,37 @@ export default function Profile() {
       </View>
     );
   }
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={{
+          borderWidth: 1,
+          padding: 5,
+          marginBottom: 10,
+          borderRadius: 10,
+        }}
+        onPress={hanldeUpdateProfile}
+      >
+        <Text>Update Your Image</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={pickImage}>
+        <Text>Choose a profile photo</Text>
+      </TouchableOpacity>
       <Image
         source={{
           uri: `https://react-bank-project.eapi.joincoded.com/${data?.image}`,
@@ -39,6 +86,36 @@ export default function Profile() {
       <Text style={styles.balance}>Balance: ${data.balance.toFixed(2)}</Text>
       <View style={styles.cardcontainer}>
         <View style={styles.card}>
+          <Image
+            source={{
+              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQihPgqcZeP-Qoswt2GJUh16eMoPL27lzWj1w&s",
+            }}
+            style={styles.flag}
+          />
+          <Image
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/512/6404/6404078.png",
+            }}
+            style={styles.chip}
+          />
+          <Image
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/512/633/633611.png",
+            }}
+            style={styles.nfc}
+          />
+          <Text style={styles.brand}>VISA</Text>
+          <View style={styles.row}>
+            <Text style={styles.number}>4552 6218 2043 8931</Text>
+          </View>
+          <View style={styles.bottomRow}>
+            <Text style={styles.name}>ALI ALSHAMMARI</Text>
+            <Text style={styles.expiry}>02/24</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.cardcontainer2}>
+        <View style={styles.card2}>
           <Image
             source={{
               uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQihPgqcZeP-Qoswt2GJUh16eMoPL27lzWj1w&s",
@@ -120,11 +197,34 @@ const styles = StyleSheet.create({
   cardcontainer: {
     // flex: 1,
     // backgroundColor: "#0A0A0A",
-    marginTop: 20,
+    marginTop: 140,
     justifyContent: "center",
     alignItems: "center",
   },
+  cardcontainer2: {
+    // flex: 1,
+    // backgroundColor: "#0A0A0A",
+    marginTop: 300,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+  },
   card: {
+    width: 340,
+    height: 200,
+    borderRadius: 20,
+    backgroundColor: "#253747",
+    padding: 20,
+    position: "relative",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 12,
+    borderColor: "#3A3A3A",
+    borderWidth: 1,
+  },
+  card2: {
     width: 340,
     height: 200,
     borderRadius: 20,
@@ -139,6 +239,7 @@ const styles = StyleSheet.create({
     borderColor: "#3A3A3A",
     borderWidth: 1,
   },
+
   chip: {
     width: 40,
     height: 30,

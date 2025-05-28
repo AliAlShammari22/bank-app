@@ -51,6 +51,15 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="(xcards)"
+        options={{
+          title: "Cards",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome6 name="credit-card" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="(profile)"
         options={{
           title: "Profile",

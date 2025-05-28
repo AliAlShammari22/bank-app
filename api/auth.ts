@@ -45,7 +45,18 @@ const getAllUsers = async () => {
 };
 
 const updateProfile = async (image: string) => {
-  const { data } = await instance.put("/mini-project/api/auth/profile", image);
+  const formData = new FormData();
+  formData.append("image", {
+    name: "image.jpg",
+    uri: image,
+    type: "image/jpeg",
+  } as any);
+
+  const { data } = await instance.put(
+    "/mini-project/api/auth/profile",
+    formData
+  );
+
   return data;
 };
 
