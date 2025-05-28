@@ -19,7 +19,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [username, setname] = useState("");
   const [image, setImage] = useState<string | null>(null);
-  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const { setIsAuthenticated } = useContext(AuthContext);
 
   const router = useRouter();
 

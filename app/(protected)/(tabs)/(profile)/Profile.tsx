@@ -46,7 +46,9 @@ export default function Profile() {
             style={styles.flag}
           />
           <Image
-            source={{ uri: "https://i.ibb.co/Ch0fZkK/chip.png" }}
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/512/6404/6404078.png",
+            }}
             style={styles.chip}
           />
           <Image
