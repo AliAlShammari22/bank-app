@@ -1,6 +1,6 @@
 import { depositMyAcccount, withdraw } from "@/api/transaction";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Pressable,
   SafeAreaView,
@@ -35,7 +35,7 @@ export default function Home() {
     }
     return n;
   };
-
+  console.log("Home component rendered");
   const handleDeposit = () => {
     const n = parseAmount();
     if (n !== null) depositMutation.mutate(n);
