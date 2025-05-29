@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,292 +14,188 @@ import {
 } from "react-native";
 
 export default function Profile() {
-  const [image, setImage] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const { data, isLoading, error } = useQuery({
     queryKey: ["profile"],
     queryFn: me,
   });
 
-  const { mutate } = useMutation({
+  const updateMutation = useMutation({
     mutationKey: ["updateProfile"],
-    mutationFn: () => updateProfile(image || ""),
-    onSuccess: () => {
-      alert("Profile Image Updated");
-    },
+    mutationFn: () => updateProfile(imageUri || ""),
+    onSuccess: () => alert("Profile image updated!"),
   });
 
-  //   console.log(data);
-
-  const hanldeUpdateProfile = () => {
-    mutate();
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
   };
+
   if (isLoading) {
     return (
-      <View style={styles.loaderContainer}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
   if (error) {
     return (
-      <View style={styles.errorContainer}>
+      <View style={styles.loader}>
         <Text style={styles.errorText}>Failed to load profile.</Text>
       </View>
     );
   }
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
 
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
+  const username = data?.username ?? "User";
+  const balance = data?.balance?.toFixed(2) ?? "0.00";
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={{
-          borderWidth: 1,
-          padding: 5,
-          marginBottom: 10,
-          borderRadius: 10,
-        }}
-        onPress={hanldeUpdateProfile}
-      >
-        <Text>Update Your Image</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={pickImage}>
-        <Text>Choose a profile photo</Text>
-      </TouchableOpacity>
-      <Image
-        source={{
-          uri: `https://react-bank-project.eapi.joincoded.com/${data?.image}`,
-        }}
-        style={styles.avatar}
-      />
-      <Text style={styles.username}>{data?.username}</Text>
-      <Text style={styles.balance}>Balance: ${data.balance.toFixed(2)}</Text>
-      <View style={styles.cardcontainer}>
-        <View style={styles.card}>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Greeting */}
+        <Text style={styles.greeting}>
+          Hello, <Text style={styles.username}>{username}</Text> 👋
+        </Text>
+        <Text style={styles.subtext}>Welcome to your profile</Text>
+
+        {/* Avatar */}
+        <View style={styles.avatarContainer}>
           <Image
             source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQihPgqcZeP-Qoswt2GJUh16eMoPL27lzWj1w&s",
+              uri: imageUri
+                ? imageUri
+                : `https://react-bank-project.eapi.joincoded.com/${data?.image}`,
             }}
-            style={styles.flag}
+            style={styles.avatar}
           />
-          <Image
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/6404/6404078.png",
-            }}
-            style={styles.chip}
-          />
-          <Image
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/633/633611.png",
-            }}
-            style={styles.nfc}
-          />
-          <Text style={styles.brand}>VISA</Text>
-          <View style={styles.row}>
-            <Text style={styles.number}>4552 6218 2043 8931</Text>
-          </View>
-          <View style={styles.bottomRow}>
-            <Text style={styles.name}>ALI ALSHAMMARI</Text>
-            <Text style={styles.expiry}>02/24</Text>
-          </View>
         </View>
-      </View>
-      <View style={styles.cardcontainer2}>
-        <View style={styles.card2}>
-          <Image
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQihPgqcZeP-Qoswt2GJUh16eMoPL27lzWj1w&s",
-            }}
-            style={styles.flag}
-          />
-          <Image
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/6404/6404078.png",
-            }}
-            style={styles.chip}
-          />
-          <Image
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/633/633611.png",
-            }}
-            style={styles.nfc}
-          />
-          <Text style={styles.brand}>VISA</Text>
-          <View style={styles.row}>
-            <Text style={styles.number}>4552 6218 2043 8931</Text>
-          </View>
-          <View style={styles.bottomRow}>
-            <Text style={styles.name}>FAJER A. ALKANDARI</Text>
-            <Text style={styles.expiry}>02/24</Text>
-          </View>
+
+        {/* Update Buttons */}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.pickButton]}
+            onPress={pickImage}
+          >
+            <Text style={styles.actionTextchoose}>Choose Photo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.uploadButton]}
+            onPress={() => updateMutation.mutate()}
+          >
+            <Text style={styles.actionText}>Update</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-    </View>
+
+        {/* Balance Card */}
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceLabel}>Current Balance</Text>
+          <Text style={styles.balanceValue}>${balance}</Text>
+        </View>
+
+        {/* Credit Cards Carousel */}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
+  safe: { flex: 1, backgroundColor: "#F5F5F5" },
+  container: {
     alignItems: "center",
+    paddingVertical: 24,
   },
-  errorContainer: {
+  loader: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
   errorText: {
     color: "#D00",
     fontSize: 16,
   },
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5F5F5",
-    marginTop: 70,
-    margin: 10,
-    borderWidth: 1,
-    borderRadius: 10,
+  greeting: {
+    fontSize: 28,
+    fontWeight: "600",
+    color: "#333",
+  },
+  username: {
+    fontWeight: "700",
+    color: "#007AFF",
+  },
+  subtext: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 24,
+  },
+  avatarContainer: {
+    borderWidth: 2,
     borderColor: "#007AFF",
+    borderRadius: 80,
+    padding: 4,
+    marginBottom: 16,
   },
   avatar: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 20,
-    borderWidth: 2,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    marginBottom: 24,
+  },
+  actionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginHorizontal: 8,
+  },
+  pickButton: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
     borderColor: "#007AFF",
   },
-  username: {
-    fontSize: 22,
+  uploadButton: {
+    backgroundColor: "#007AFF",
+  },
+  actionText: {
+    fontSize: 14,
     fontWeight: "600",
+    color: "#fff",
+  },
+  actionTextchoose: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#007AFF",
+  },
+  balanceCard: {
+    backgroundColor: "#fff",
+    width: "90%",
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 32,
+    // Shadow
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  balanceLabel: {
+    fontSize: 16,
+    color: "#888",
     marginBottom: 8,
   },
-  balance: {
-    fontSize: 18,
-    color: "#555",
-    marginTop: 4,
-  },
-  cardcontainer: {
-    // flex: 1,
-    // backgroundColor: "#0A0A0A",
-    marginTop: 140,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cardcontainer2: {
-    // flex: 1,
-    // backgroundColor: "#0A0A0A",
-    marginTop: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-  },
-  card: {
-    width: 340,
-    height: 200,
-    borderRadius: 20,
-    backgroundColor: "#253747",
-    padding: 20,
-    position: "relative",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 12,
-    borderColor: "#3A3A3A",
-    borderWidth: 1,
-  },
-  card2: {
-    width: 340,
-    height: 200,
-    borderRadius: 20,
-    backgroundColor: "#1C1C1C",
-    padding: 20,
-    position: "relative",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 12,
-    borderColor: "#3A3A3A",
-    borderWidth: 1,
-  },
-
-  chip: {
-    width: 40,
-    height: 30,
-    resizeMode: "contain",
-    position: "absolute",
-    top: 50,
-    left: 20,
-  },
-  nfc: {
-    width: 22,
-    height: 22,
-    resizeMode: "contain",
-    position: "absolute",
-    top: 22,
-    right: 20,
-    opacity: 0.9,
-  },
-  flag: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    width: 32,
-    height: 20,
-    resizeMode: "cover",
-    borderRadius: 3,
-  },
-  brand: {
-    position: "absolute",
-    bottom: 10,
-    right: 20,
-    color: "#FFFFFF",
-    fontSize: 22,
+  balanceValue: {
+    fontSize: 32,
     fontWeight: "700",
-  },
-  row: {
-    marginTop: 80,
-    marginBottom: 10,
-  },
-  number: {
-    color: "#ffffff",
-    fontSize: 20,
-    fontWeight: "600",
-    fontVariant: ["tabular-nums"],
-    letterSpacing: 2,
-  },
-  bottomRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-  name: {
-    color: "#AAAAAA",
-    fontSize: 14,
-    fontWeight: "400",
-  },
-  expiry: {
-    color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "600",
+    color: "#28a745",
   },
 });
