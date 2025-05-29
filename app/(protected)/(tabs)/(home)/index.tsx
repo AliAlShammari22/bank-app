@@ -1,14 +1,14 @@
 import { depositMyAcccount, withdraw } from "@/api/transaction";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
+  Pressable,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const [amountText, setAmountText] = useState("");
@@ -61,19 +61,27 @@ export default function Home() {
         />
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity
+          <Pressable
             onPress={handleDeposit}
-            style={[styles.button, styles.deposit]}
+            style={({ pressed }) => [
+              styles.button,
+              styles.deposit,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={styles.buttonText}>Deposit</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
+          <Pressable
             onPress={handleWithdraw}
-            style={[styles.button, styles.withdraw]}
+            style={({ pressed }) => [
+              styles.button,
+              styles.withdraw,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={styles.buttonText}>Withdraw</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {depositMutation.error && (
@@ -112,12 +120,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
     marginBottom: 24,
-    // Shadow (iOS)
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    // Elevation (Android)
     elevation: 2,
     alignSelf: "center",
     width: "70%",
@@ -141,13 +147,15 @@ const styles = StyleSheet.create({
   withdraw: {
     backgroundColor: "#dc3545",
   },
+  // this style only applies when pressed === true
+  pressed: {
+    transform: [{ scale: 0.96 }],
+    opacity: 0.8,
+  },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
-  },
-  loader: {
-    marginBottom: 16,
   },
   error: {
     color: "#dc3545",

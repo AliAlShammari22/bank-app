@@ -21,12 +21,11 @@ const withdraw = async (amount: number) => {
   return data;
 };
 
-const transfer = async (amount: number, username: string) => {
+const transfer = async (username: string, amount: number) => {
   const { data } = await instance.put(
-    "/mini-project/api/transactions/transfer/<username>",
+    `/mini-project/api/transactions/transfer/${username}`,
     {
       amount,
-      username,
     }
   );
   return data;

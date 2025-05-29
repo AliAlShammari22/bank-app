@@ -24,7 +24,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="(home)"
         options={{
-          title: "Home",
+          title: "Finance",
 
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" color={color} size={size} />
@@ -44,7 +44,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="(users)"
         options={{
-          title: "Users",
+          title: "Beneficiaries",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome6 name="users" size={size} color={color} />
           ),
