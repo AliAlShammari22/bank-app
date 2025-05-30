@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -7,17 +8,8 @@ export interface UsersProps {
   balance: number;
   image: string;
 }
-
-export interface UsersItemProps extends UsersProps {
-  onTransfer: () => void;
-}
-
-const UsersItem = ({
-  username,
-  balance,
-  image,
-  onTransfer,
-}: UsersItemProps) => {
+const UsersItem = ({ _id, username, balance, image }: UsersProps) => {
+  const router = useRouter();
   return (
     <View style={[styles.row, { borderLeftColor: "#6a69d6" }]}>
       <Image
@@ -36,7 +28,10 @@ const UsersItem = ({
             : `$${balance.toFixed(2)}`}
         </Text>
       </View>
-      <TouchableOpacity onPress={onTransfer} style={styles.transferButton}>
+      <TouchableOpacity
+        onPress={() => router.push(`/${_id}`)}
+        style={styles.transferButton}
+      >
         <Text style={styles.transferText}>Transfer</Text>
       </TouchableOpacity>
     </View>

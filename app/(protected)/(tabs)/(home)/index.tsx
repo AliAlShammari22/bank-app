@@ -2,54 +2,42 @@ import { depositMyAcccount, withdraw } from "@/api/transaction";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 
 export default function Home() {
   const [amountText, setAmountText] = useState("");
 
+  const handleTransaction = (action: "deposit" | "withdraw") => {
+    const amount = parseFloat(amountText);
+    if (!amount || amount <= 0) return alert("Enter a valid amount");
+
+    action === "deposit"
+      ? depositMutation.mutate(amount)
+      : withdrawMutation.mutate(amount);
+  };
+
   const depositMutation = useMutation({
-    mutationKey: ["deposit"],
     mutationFn: depositMyAcccount,
     onSuccess: () => alert("Deposit succeeded!"),
-    onError: () => alert("Deposit failed!"),
+    onError: () => alert("Deposit Faild!"),
   });
 
   const withdrawMutation = useMutation({
-    mutationKey: ["withdraw"],
     mutationFn: withdraw,
     onSuccess: () => alert("Withdrawal succeeded!"),
-    onError: () => alert("Withdrawal failed!"),
+    onError: () => alert("Withdrawal Faild!"),
   });
-
-  const parseAmount = () => {
-    const n = Number(amountText);
-    if (isNaN(n) || n <= 0) {
-      alert("Please enter a valid amount");
-      return null;
-    }
-    return n;
-  };
-  console.log("Home component rendered");
-  const handleDeposit = () => {
-    const n = parseAmount();
-    if (n !== null) depositMutation.mutate(n);
-  };
-
-  const handleWithdraw = () => {
-    const n = parseAmount();
-    if (n !== null) withdrawMutation.mutate(n);
-  };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Text style={styles.title}>Manage Funds</Text>
+        <Text style={styles.title}>Manage Your Funds</Text>
 
         <TextInput
           style={styles.input}
@@ -58,73 +46,43 @@ export default function Home() {
           value={amountText}
           onChangeText={setAmountText}
           placeholderTextColor="#888"
+          returnKeyType="done"
         />
 
         <View style={styles.buttonRow}>
-          <Pressable
-            onPress={handleDeposit}
-            style={({ pressed }) => [
-              styles.button,
-              styles.deposit,
-              pressed && styles.pressed,
-            ]}
+          <TouchableOpacity
+            style={styles.deposit}
+            onPress={() => handleTransaction("deposit")}
           >
             <Text style={styles.buttonText}>Deposit</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={handleWithdraw}
-            style={({ pressed }) => [
-              styles.button,
-              styles.withdraw,
-              pressed && styles.pressed,
-            ]}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.withdraw}
+            onPress={() => handleTransaction("withdraw")}
           >
             <Text style={styles.buttonText}>Withdraw</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
-
-        {depositMutation.error && (
-          <Text style={styles.error}>Deposit failed.</Text>
-        )}
-        {withdrawMutation.error && (
-          <Text style={styles.error}>Withdrawal failed.</Text>
-        )}
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#fcfdff",
-  },
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-  },
+  safe: { flex: 1, backgroundColor: "#fcfdff" },
+  container: { flex: 1, padding: 24, justifyContent: "center" },
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#333",
     textAlign: "center",
     marginBottom: 32,
   },
   input: {
     backgroundColor: "#f4f4f6",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    padding: 12,
     borderRadius: 8,
     fontSize: 18,
-    color: "#333",
     marginBottom: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
     alignSelf: "center",
     width: "70%",
   },
@@ -132,34 +90,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginHorizontal: 20,
-    marginBottom: 16,
   },
-  button: {
+  deposit: {
     flex: 1,
-    paddingVertical: 14,
+    backgroundColor: "#28a745",
+    padding: 14,
     borderRadius: 8,
     alignItems: "center",
     marginHorizontal: 8,
   },
-  deposit: {
-    backgroundColor: "#28a745",
-  },
   withdraw: {
+    flex: 1,
     backgroundColor: "#dc3545",
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 8,
   },
-  // this style only applies when pressed === true
-  pressed: {
-    transform: [{ scale: 0.96 }],
-    opacity: 0.8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  error: {
-    color: "#dc3545",
-    textAlign: "center",
-    marginTop: 8,
-  },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

@@ -43,6 +43,19 @@ export default function Register() {
   });
 
   const handleRegister = () => {
+    if (!username.trim() || !password.trim()) {
+      if (!username.trim() && !password.trim()) {
+        alert("Please enter your username and password");
+      } else if (!username.trim()) {
+        alert("Please enter your username");
+      } else {
+        alert("Please enter your password");
+      }
+      return;
+    }
+    if (password.length < 8) {
+      return alert("Please enter more than 8 charcheters");
+    }
     mutate();
   };
 

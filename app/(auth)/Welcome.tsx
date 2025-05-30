@@ -10,7 +10,7 @@ const Welcome = () => {
     <View style={styles.container}>
       {/* ② Background video absolutely filling */}
       <Video
-        // source={require("../../assets/videos/videoplayback.mp4")}
+        source={require("../../assets/videos/bankwelcome.mp4")}
         style={StyleSheet.absoluteFillObject}
         shouldPlay
         isLooping

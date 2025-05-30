@@ -60,8 +60,8 @@ const updateProfile = async (image: string) => {
   return data;
 };
 
-const getUserId = async () => {
-  const { data } = await instance.get("/mini-project/api/auth/user/<userId>");
+const getUserId = async (userId: string) => {
+  const { data } = await instance.get(`/mini-project/api/auth/user/${userId}`);
   return data;
 };
 
