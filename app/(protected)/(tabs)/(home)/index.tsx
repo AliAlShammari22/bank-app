@@ -1,111 +1,261 @@
-import { depositMyAcccount, withdraw } from "@/api/transaction";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { getMyTransaction } from "@/api/transaction";
+import TransactionItem from "@/components/TransactionItem";
+import AuthContext from "@/context/AuthContext";
+import colors from "@/types/colors";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
+import React, { useContext } from "react";
 import {
+  ActivityIndicator,
+  FlatList,
+  Image,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
 export default function Home() {
-  const [amountText, setAmountText] = useState("");
-
-  const handleTransaction = (action: "deposit" | "withdraw") => {
-    const amount = parseFloat(amountText);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    action === "deposit"
-      ? depositMutation.mutate(amount)
-      : withdrawMutation.mutate(amount);
-  };
-
-  const depositMutation = useMutation({
-    mutationFn: depositMyAcccount,
-    onSuccess: () => alert("Deposit succeeded!"),
-    onError: () => alert("Deposit Faild!"),
+  const { setIsAuthenticated } = useContext(AuthContext);
+  const {
+    data: transactions = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["myTransactions"],
+    queryFn: getMyTransaction,
   });
 
-  const withdrawMutation = useMutation({
-    mutationFn: withdraw,
-    onSuccess: () => alert("Withdrawal succeeded!"),
-    onError: () => alert("Withdrawal Faild!"),
-  });
+  if (isLoading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
+  if (isError) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.error}>Failed to load: {error.message}</Text>
+      </View>
+    );
+  }
+
+  // Take only the 5 most recent transactions:
+  // If your API returns newest-first:
+  const recentTx = transactions.slice(-5).reverse();
+  // If it returned oldest-first, use:
+  // const recentTx = transactions.slice(-5).reverse();
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Manage Your Funds</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Enter amount"
-          keyboardType="number-pad"
-          value={amountText}
-          onChangeText={setAmountText}
-          placeholderTextColor="#888"
-          returnKeyType="done"
-        />
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.deposit}
-            onPress={() => handleTransaction("deposit")}
-          >
-            <Text style={styles.buttonText}>Deposit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.withdraw}
-            onPress={() => handleTransaction("withdraw")}
-          >
-            <Text style={styles.buttonText}>Withdraw</Text>
-          </TouchableOpacity>
+      <View style={styles.background}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Ionicons
+            name="person-circle-outline"
+            size={28}
+            color={colors.textPrimary}
+          />
+          <Text style={styles.greeting}>Hi, John!</Text>
+          <View style={styles.headerIcons}>
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={colors.textPrimary}
+            />
+            <Ionicons
+              name="help-circle-outline"
+              size={24}
+              color={colors.textPrimary}
+              style={{ marginLeft: 16 }}
+            />
+          </View>
         </View>
+
+        {/* Screen Title */}
+        <Text style={styles.screenTitle}>HOME</Text>
+
+        {/* Card Carousel */}
+        <View style={{ height: 157 }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.cardScroll}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
+          >
+            <Image
+              source={require("../../../../assets/images/cardme.png")}
+              style={styles.card}
+            />
+            <Image
+              source={require("../../../../assets/images/cardfajr.png")}
+              style={styles.card}
+            />
+            <Text style={styles.balanceLabel}>Balance:</Text>
+          </ScrollView>
+        </View>
+
+        {/* Additional content can go here */}
+        <View>
+          <Text style={styles.screenTitle}>Finance</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 60,
+            }}
+          >
+            <View>
+              <TouchableOpacity
+                style={styles.button}
+                activeOpacity={0.7}
+                onPress={() => router.push("/Deposit")}
+              >
+                <AntDesign
+                  name="arrowdown"
+                  size={30}
+                  color={colors.textPrimary}
+                />
+              </TouchableOpacity>
+              <Text style={styles.depowithtext}>Deposit</Text>
+            </View>
+            <View>
+              <TouchableOpacity
+                style={styles.button}
+                activeOpacity={0.7}
+                onPress={() => router.push("/Withdraw")}
+              >
+                <AntDesign
+                  name="arrowup"
+                  size={30}
+                  ç
+                  color={colors.textPrimary}
+                />
+              </TouchableOpacity>
+              <Text style={styles.depowithtext}>Withdraw</Text>
+            </View>
+          </View>
+        </View>
+        <Text style={styles.screenTitle}>Recent Transactions</Text>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={recentTx}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => <TransactionItem transaction={item} />}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No recent transactions</Text>
+          }
+        />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#fcfdff" },
-  container: { flex: 1, padding: 24, justifyContent: "center" },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: 32,
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
-  input: {
-    backgroundColor: "#f4f4f6",
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 18,
-    marginBottom: 24,
-    alignSelf: "center",
-    width: "70%",
+  background: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
-  buttonRow: {
+  header: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    marginHorizontal: 20,
+    paddingHorizontal: 24,
+    paddingTop: 10,
   },
-  deposit: {
-    flex: 1,
-    backgroundColor: "#28a745",
-    padding: 14,
-    borderRadius: 8,
+  greeting: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.textPrimary,
+    textAlign: "center",
+  },
+  headerIcons: {
+    flexDirection: "row",
+  },
+  screenTitle: {
+    marginTop: 15,
+    marginHorizontal: 24,
+    fontSize: 24,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  cardScroll: {
+    marginTop: 16,
+    maxHeight: 150,
+  },
+  card: {
+    resizeMode: "contain",
+    width: 230,
+    height: 150,
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
     alignItems: "center",
-    marginHorizontal: 8,
+    marginRight: 10,
   },
-  withdraw: {
-    flex: 1,
-    backgroundColor: "#dc3545",
-    padding: 14,
-    borderRadius: 8,
+  balanceLabel: {
+    position: "absolute",
+    top: 25,
+    left: 51,
+    color: colors.textPrimary,
+    fontWeight: "500",
+  },
+  button: {
+    marginTop: 13,
+    marginLeft: 20,
+    width: 70,
+    height: 70,
+    backgroundColor: "#AC9FBB",
+    justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 8,
+    borderRadius: 35,
+    borderWidth: 1,
+    borderColor: colors.textPrimary,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  depowithtext: {
+    textAlign: "center",
+    width: 110,
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.textPrimary,
+    marginTop: 5,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.background,
+  },
+  list: {
+    padding: 16,
+  },
+  error: {
+    color: "red",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#888",
+  },
 });

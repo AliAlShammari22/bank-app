@@ -1,3 +1,4 @@
+import colors from "@/types/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Tabs } from "expo-router";
@@ -9,16 +10,16 @@ const TabLayout = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          //   backgroundColor: colors.primary,
-          //   borderTopColor: colors.primary,
+          backgroundColor: colors.background,
+          borderTopColor: "#AC9FBB",
           height: 70,
           paddingBottom: 0,
-          borderRadius: 50,
+          borderRadius: 0,
           borderColor: "white",
           marginBottom: 0,
         },
-        tabBarActiveTintColor: "#7162eb",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#AC9FBB",
+        tabBarInactiveTintColor: "#F7EBEC",
       }}
     >
       <Tabs.Screen
@@ -50,7 +51,7 @@ const TabLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="(xcards)"
         options={{
           title: "Cards",
@@ -58,7 +59,7 @@ const TabLayout = () => {
             <FontAwesome6 name="credit-card" size={size} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="(profile)"
         options={{

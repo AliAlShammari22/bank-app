@@ -1,5 +1,15 @@
 import instance from ".";
 
+export interface Transaction {
+  _id: string;
+  date: string; // e.g. ISO string
+  amount: number;
+  type: "deposit" | "withdraw" | "transfer";
+  createdAt: string; // if your backend returns these
+  updatedAt: string;
+  // …any other fields your server returns
+}
+
 const getMyTransaction = async () => {
   const { data } = await instance.get("/mini-project/api/transactions/my");
   return data;

@@ -1,3 +1,4 @@
+import colors from "@/types/colors";
 import { Transaction } from "@/types/Transactions";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -40,7 +41,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     marginBottom: 8,
-    backgroundColor: "#fff",
+    backgroundColor: "#AC9FBB",
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 8,
     borderLeftWidth: 4,
     shadowColor: "#000",

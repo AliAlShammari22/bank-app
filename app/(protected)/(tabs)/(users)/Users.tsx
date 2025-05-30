@@ -1,5 +1,6 @@
 import { getAllUsers } from "@/api/auth";
 import UsersItem, { UsersProps } from "@/components/UsersItem";
+import colors from "@/types/colors";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import {
@@ -52,8 +53,13 @@ export default function Users() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#fff" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  safe: { flex: 1, backgroundColor: colors.background },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#AC9FBB",
+  },
   error: { color: "red" },
   list: { padding: 16 },
   separator: { height: 8 },

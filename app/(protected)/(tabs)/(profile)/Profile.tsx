@@ -1,9 +1,11 @@
 import { me, updateProfile } from "@/api/auth";
+import colors from "@/types/colors";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   SafeAreaView,
   ScrollView,
@@ -20,11 +22,19 @@ export default function Profile() {
     queryFn: me,
   });
 
-  const updateMutation = useMutation({
+  const { mutate } = useMutation({
     mutationKey: ["updateProfile"],
     mutationFn: () => updateProfile(imageUri || ""),
     onSuccess: () => alert("Profile image updated!"),
+    onError: (err: any) => Alert.alert("Update failed", err.message),
   });
+  const handleUpdate = () => {
+    if (!imageUri) {
+      Alert.alert("Please choose an image first"); // return early
+      return;
+    }
+    mutate();
+  };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -87,7 +97,7 @@ export default function Profile() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, styles.uploadButton]}
-            onPress={() => updateMutation.mutate()}
+            onPress={handleUpdate}
           >
             <Text style={styles.actionText}>Update</Text>
           </TouchableOpacity>
@@ -106,7 +116,7 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#F5F5F5" },
+  safe: { flex: 1, backgroundColor: colors.background },
   container: {
     alignItems: "center",
     paddingVertical: 24,
@@ -123,7 +133,7 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#333",
+    color: colors.textPrimary,
   },
   username: {
     fontWeight: "700",
@@ -131,7 +141,7 @@ const styles = StyleSheet.create({
   },
   subtext: {
     fontSize: 16,
-    color: "#666",
+    color: colors.textPrimary,
     marginBottom: 24,
   },
   avatarContainer: {
