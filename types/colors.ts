@@ -5,11 +5,13 @@ const colors = {
   success: "#16A34A",
   warning: "#F59E0B",
   error: "#DC2626",
-  background: "#f6f6f9",
+  background: "#2C2828",
+  buttonback: "#0b0705",
+  listback: "#0b0705",
   inputBg: "#FFFFFF",
-  textPrimary: "#1d1e2c",
+  textPrimary: "#e3dac9",
   textSecondary: "#64748B",
-  border: "#7f86b1",
+  border: "#0b0705",
   white: "fff",
 };
 

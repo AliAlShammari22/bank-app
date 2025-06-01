@@ -8,19 +8,19 @@ function TransactionItem({ transaction }: { transaction: Transaction }) {
   const date = new Date(createdAt).toLocaleString();
   const color =
     type === "deposit"
-      ? "#4caf50"
+      ? "#F16F0D"
       : type === "withdraw"
-      ? "#f44336"
-      : "#2196f3";
+      ? "#7C7C7C"
+      : "#7C7C7C";
 
   return (
-    <View style={[styles.row, { borderLeftColor: "" }]}>
+    <View style={[styles.row]}>
       <View style={styles.info}>
         <Text style={styles.type}>{type.toUpperCase()}</Text>
         <Text style={[styles.date, styles.datecolor]}>{date}</Text>
       </View>
       <Text style={[styles.amount, { color }]}>
-        {type === "withdraw" ? "-" : "+"}${amount.toFixed(2)}
+        {type === "deposit" ? "+" : "-"}${amount.toFixed(2)}
       </Text>
     </View>
   );
@@ -41,11 +41,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     marginBottom: 8,
-    backgroundColor: "#d3d5e4",
+    backgroundColor: colors.listback,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 10,
     borderLeftWidth: 4,
+    // borderBottomWidth: 4,
     // shadowColor: "#000",
     // shadowOpacity: 0.1,
     // shadowRadius: 3,
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   datecolor: {
-    color: "#363a56",
+    color: colors.textPrimary,
   },
   amount: {
     fontSize: 16,

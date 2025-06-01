@@ -1,7 +1,10 @@
 import { me, updateProfile } from "@/api/auth";
+import { deleteToken } from "@/api/storage";
+import AuthContext from "@/context/AuthContext";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,6 +18,7 @@ import {
 } from "react-native";
 
 export default function Profile() {
+  const { setIsAuthenticated } = useContext(AuthContext);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const { data, isLoading, error } = useQuery({
     queryKey: ["profile"],
@@ -62,6 +66,27 @@ export default function Profile() {
       </View>
     );
   }
+  const handleLogout = () => {
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          style: "destructive",
+          onPress: async () => {
+            await deleteToken();
+            setIsAuthenticated(false);
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const username = data?.username ?? "User";
   const balance = data?.balance?.toFixed(2) ?? "0.00";
@@ -70,6 +95,22 @@ export default function Profile() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Greeting */}
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "flex-end",
+            flexDirection: "row",
+          }}
+        >
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={{ flexDirection: "row", alignItems: "center" }}
+          >
+            <Text style={{}}>Logout </Text>
+            <MaterialCommunityIcons name="logout" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.greeting}>
           Hello, <Text style={styles.username}>{username}</Text> 👋
         </Text>
@@ -208,6 +249,6 @@ const styles = StyleSheet.create({
   balanceValue: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#7f86b1", // accent color
+    color: "#7f86b1",
   },
 });

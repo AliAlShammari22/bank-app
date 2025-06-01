@@ -1,7 +1,7 @@
 import { Video } from "expo-av";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const Welcome = () => {
   const router = useRouter();
@@ -27,7 +27,12 @@ const Welcome = () => {
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       </View>
-
+      <View style={{ alignItems: "center" }}>
+        <Image
+          source={require("../../assets/images/finova.png")}
+          style={{ height: 190, width: 200, alignItems: "center" }}
+        />
+      </View>
       <View style={styles.content}>
         <Text style={styles.welcometext}>
           Welcome to your New Banking Experience
@@ -86,8 +91,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     marginHorizontal: 30,
-    // justifyContent: "",
-    marginTop: 70,
+    marginTop: 0,
   },
   welcometext: {
     fontSize: 43,
@@ -123,12 +127,5 @@ const styles = StyleSheet.create({
   registerText: {
     color: "#0170df",
     fontWeight: "500" as any,
-  },
-  photo: {
-    width: 350,
-    height: 350,
-    resizeMode: "cover",
-    alignSelf: "center",
-    marginTop: 20,
   },
 });

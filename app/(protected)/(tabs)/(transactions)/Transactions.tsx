@@ -1,8 +1,9 @@
 import { getMyTransaction } from "@/api/transaction";
 import TransactionItem from "@/components/TransactionItem";
 import colors from "@/types/colors";
+import { Transaction } from "@/types/Transactions";
 import { useQuery } from "@tanstack/react-query";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -14,17 +15,12 @@ import {
 import { Searchbar } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface Transaction {
-  _id: string;
-  date: string;
-  amount: number;
-  type: "deposit" | "withdraw" | "transfer";
-  createdAt: string;
-  updatedAt: string;
-}
-
 export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<null | Transaction["type"]>(
+    null
+  );
+
   const {
     data: transactions = [],
     isLoading,
@@ -35,21 +31,19 @@ export default function Transactions() {
     queryFn: getMyTransaction,
   });
 
-  const [typeFilter, setTypeFilter] = useState<null | Transaction["type"]>(
-    null
-  );
+  // 1) First, filter by type
+  let filtered = typeFilter
+    ? transactions.filter((tx) => tx.type === typeFilter)
+    : transactions;
 
-  let filtered = useMemo(() => {
-    return typeFilter
-      ? transactions.filter((tx) => tx.type === typeFilter)
-      : transactions;
-  }, [transactions, typeFilter]);
-
-  filtered = filtered.filter(
-    (t: any) =>
-      t.createdAt.includes(searchQuery) ||
-      String(t.amount).includes(searchQuery)
-  );
+  // 2) Then apply the search‐by‐createdAt or amount
+  if (searchQuery) {
+    filtered = filtered.filter((t) => {
+      const matchesDate = t.createdAt.includes(searchQuery);
+      const matchesAmount = String(t.amount).includes(searchQuery);
+      return matchesDate || matchesAmount;
+    });
+  }
 
   if (isLoading) {
     return (
@@ -72,7 +66,7 @@ export default function Transactions() {
       style={[styles.safe, { backgroundColor: colors.background }]}
       edges={["top"]}
     >
-      {/* Type Filter Buttons */}
+      {/* Search Bar */}
       <Searchbar
         returnKeyType="done"
         placeholder="Search"
@@ -85,12 +79,17 @@ export default function Transactions() {
           marginHorizontal: 10,
           borderColor: colors.border,
           borderWidth: 1,
-          backgroundColor: "fff",
-          color: colors.textSecondary,
+          backgroundColor: "#fff",
         }}
       />
+
+      {/* Type Filter Buttons */}
       <View style={styles.typeContainer}>
-        {[null, "deposit", "withdraw", "transfer"].map((t: any) => (
+        {(
+          [null, "deposit", "withdraw", "transfer"] as Array<
+            null | Transaction["type"]
+          >
+        ).map((t) => (
           <TouchableOpacity
             key={String(t)}
             style={[styles.typeBtn, typeFilter === t && styles.typeBtnActive]}
@@ -134,13 +133,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: colors.textSecondary,
+    borderColor: colors.textPrimary,
     borderRadius: 20,
   },
   typeBtnActive: {
-    backgroundColor: colors.border,
+    backgroundColor: "#F16F0D",
+    color: colors.textPrimary,
   },
-  typeText: { color: colors.textSecondary, fontSize: 12 },
+  typeText: { color: colors.textPrimary, fontSize: 12 },
   typeTextActive: { color: colors.white },
 
   list: { padding: 16 },

@@ -49,7 +49,7 @@ export default function Home() {
     );
   }
   const balance = data?.balance?.toFixed(2) ?? "0.00";
-  const recentTx = transactions.slice(-5).reverse();
+  const recentTx = transactions?.slice(-5).reverse();
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -61,7 +61,7 @@ export default function Home() {
             size={28}
             color={colors.textPrimary}
           />
-          <Text style={styles.greeting}>{`Hi,${data.username}`} </Text>
+          <Text style={styles.greeting}>{`Hi,${data?.username}`} </Text>
           <View style={styles.headerIcons}>
             <Ionicons
               name="notifications-outline"
@@ -117,7 +117,11 @@ export default function Home() {
                 activeOpacity={0.7}
                 onPress={() => router.push("/Deposit")}
               >
-                <AntDesign name="arrowdown" size={30} color="#7f86b1" />
+                <AntDesign
+                  name="arrowdown"
+                  size={30}
+                  color={colors.textPrimary}
+                />
               </TouchableOpacity>
               <Text style={styles.depowithtext}>Deposit</Text>
             </View>
@@ -127,7 +131,11 @@ export default function Home() {
                 activeOpacity={0.7}
                 onPress={() => router.push("/Withdraw")}
               >
-                <AntDesign name="arrowup" size={30} color="#7f86b1" />
+                <AntDesign
+                  name="arrowup"
+                  size={30}
+                  color={colors.textPrimary}
+                />
               </TouchableOpacity>
               <Text style={styles.depowithtext}>Withdraw</Text>
             </View>
@@ -212,7 +220,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     width: 70,
     height: 70,
-    backgroundColor: "#d3d5e4",
+    backgroundColor: colors.buttonback,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 35,
