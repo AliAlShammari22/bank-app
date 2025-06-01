@@ -1,5 +1,4 @@
 import { me, updateProfile } from "@/api/auth";
-import colors from "@/types/colors";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
@@ -25,12 +24,13 @@ export default function Profile() {
   const { mutate } = useMutation({
     mutationKey: ["updateProfile"],
     mutationFn: () => updateProfile(imageUri || ""),
-    onSuccess: () => alert("Profile image updated!"),
+    onSuccess: () => Alert.alert("Profile image updated!"),
     onError: (err: any) => Alert.alert("Update failed", err.message),
   });
+
   const handleUpdate = () => {
     if (!imageUri) {
-      Alert.alert("Please choose an image first"); // return early
+      Alert.alert("Please choose an image first");
       return;
     }
     mutate();
@@ -51,7 +51,7 @@ export default function Profile() {
   if (isLoading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#7f86b1" />
       </View>
     );
   }
@@ -93,7 +93,7 @@ export default function Profile() {
             style={[styles.actionButton, styles.pickButton]}
             onPress={pickImage}
           >
-            <Text style={styles.actionTextchoose}>Choose Photo</Text>
+            <Text style={styles.actionTextChoose}>Choose Photo</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, styles.uploadButton]}
@@ -108,15 +108,16 @@ export default function Profile() {
           <Text style={styles.balanceLabel}>Current Balance</Text>
           <Text style={styles.balanceValue}>${balance}</Text>
         </View>
-
-        {/* Credit Cards Carousel */}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: {
+    flex: 1,
+    backgroundColor: "#f5f5f8", // very light gray for subtle contrast
+  },
   container: {
     alignItems: "center",
     paddingVertical: 24,
@@ -133,20 +134,20 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: "#333333", // dark gray for primary text
   },
   username: {
     fontWeight: "700",
-    color: "#007AFF",
+    color: "#7f86b1", // accent color
   },
   subtext: {
     fontSize: 16,
-    color: colors.textPrimary,
+    color: "#555555",
     marginBottom: 24,
   },
   avatarContainer: {
     borderWidth: 2,
-    borderColor: "#007AFF",
+    borderColor: "#7f86b1",
     borderRadius: 80,
     padding: 4,
     marginBottom: 16,
@@ -155,6 +156,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
+    backgroundColor: "#e0e0e0", // placeholder gray while loading
   },
   buttonRow: {
     flexDirection: "row",
@@ -167,31 +169,31 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   pickButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "#007AFF",
+    borderColor: "#7f86b1",
   },
   uploadButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7f86b1",
   },
   actionText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#fff",
+    color: "#ffffff",
   },
-  actionTextchoose: {
+  actionTextChoose: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#007AFF",
+    color: "#7f86b1",
   },
   balanceCard: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     width: "90%",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 32,
-    // Shadow
+    // subtle shadow for depth
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 4 },
@@ -200,12 +202,12 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     fontSize: 16,
-    color: "#888",
+    color: "#777777",
     marginBottom: 8,
   },
   balanceValue: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#28a745",
+    color: "#7f86b1", // accent color
   },
 });

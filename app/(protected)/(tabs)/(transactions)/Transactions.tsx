@@ -54,7 +54,7 @@ export default function Transactions() {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.border} />
+        <ActivityIndicator size="large" color={colors.textPrimary} />
       </View>
     );
   }
@@ -74,9 +74,20 @@ export default function Transactions() {
     >
       {/* Type Filter Buttons */}
       <Searchbar
+        returnKeyType="done"
         placeholder="Search"
         onChangeText={setSearchQuery}
         value={searchQuery}
+        iconColor="#64748B"
+        placeholderTextColor="#64748B"
+        inputStyle={{ color: colors.primary }}
+        style={{
+          marginHorizontal: 10,
+          borderColor: colors.border,
+          borderWidth: 1,
+          backgroundColor: "fff",
+          color: colors.textSecondary,
+        }}
       />
       <View style={styles.typeContainer}>
         {[null, "deposit", "withdraw", "transfer"].map((t: any) => (

@@ -3,6 +3,7 @@ import colors from "@/types/colors";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import {
+  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -29,6 +30,10 @@ export default function Deposit() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
+        <Image
+          source={require("../../../../assets/images/depo.png")}
+          style={{ height: 190, width: 200 }}
+        />
         <Text style={styles.title}>Deposit Funds</Text>
 
         <TextInput
@@ -58,6 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 28,
@@ -68,6 +74,8 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#f4f4f6",
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: 12,
     borderRadius: 8,
     fontSize: 18,
@@ -76,12 +84,13 @@ const styles = StyleSheet.create({
     width: "70%",
   },
   deposit: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#7f86b1",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
     alignSelf: "center",
     width: "50%",
+    marginBottom: 150,
   },
   buttonText: {
     color: "#fff",

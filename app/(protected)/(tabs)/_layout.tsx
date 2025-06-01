@@ -1,4 +1,3 @@
-import colors from "@/types/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Tabs } from "expo-router";
@@ -10,16 +9,17 @@ const TabLayout = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: "#AC9FBB",
+          backgroundColor: "#ebecf3",
+          borderWidth: 0,
+          // borderTopColor: "#AC9FBB",
           height: 70,
           paddingBottom: 0,
           borderRadius: 0,
           borderColor: "white",
           marginBottom: 0,
         },
-        tabBarActiveTintColor: "#AC9FBB",
-        tabBarInactiveTintColor: "#F7EBEC",
+        tabBarActiveTintColor: "#424463",
+        tabBarInactiveTintColor: "#7f86b1",
       }}
     >
       <Tabs.Screen

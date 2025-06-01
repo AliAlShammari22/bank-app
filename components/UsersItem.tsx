@@ -11,8 +11,9 @@ export interface UsersProps {
 }
 const UsersItem = ({ _id, username, balance, image }: UsersProps) => {
   const router = useRouter();
+
   return (
-    <View style={[styles.row, { borderLeftColor: "#6a69d6" }]}>
+    <View style={[styles.row, { borderLeftColor: colors.border }]}>
       <Image
         style={styles.image}
         source={{
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     marginBottom: 8,
-    backgroundColor: "#AC9FBB",
+    backgroundColor: "#d3d5e4",
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,
@@ -72,13 +73,13 @@ const styles = StyleSheet.create({
   },
   balance: {
     fontSize: 12,
-    color: "#666",
+    color: "#363a56",
     marginTop: 4,
   },
   transferButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#90adfe",
+    backgroundColor: "#5f6898",
     borderRadius: 6,
   },
   transferText: {

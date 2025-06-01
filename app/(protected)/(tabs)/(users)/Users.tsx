@@ -26,7 +26,7 @@ export default function Users() {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#6a69d6" />
+        <ActivityIndicator size="large" color={colors.textPrimary} />
       </View>
     );
   }
@@ -54,12 +54,7 @@ export default function Users() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#AC9FBB",
-  },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
   error: { color: "red" },
   list: { padding: 16 },
   separator: { height: 8 },

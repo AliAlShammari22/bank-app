@@ -1,11 +1,11 @@
+import { me } from "@/api/auth";
 import { getMyTransaction } from "@/api/transaction";
 import TransactionItem from "@/components/TransactionItem";
-import AuthContext from "@/context/AuthContext";
 import colors from "@/types/colors";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React, { useContext } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -19,7 +19,6 @@ import {
 } from "react-native";
 
 export default function Home() {
-  const { setIsAuthenticated } = useContext(AuthContext);
   const {
     data: transactions = [],
     isLoading,
@@ -29,11 +28,15 @@ export default function Home() {
     queryKey: ["myTransactions"],
     queryFn: getMyTransaction,
   });
+  const { data } = useQuery({
+    queryKey: ["profile"],
+    queryFn: me,
+  });
 
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.textPrimary} />
       </View>
     );
   }
@@ -45,12 +48,9 @@ export default function Home() {
       </View>
     );
   }
-
-  // Take only the 5 most recent transactions:
-  // If your API returns newest-first:
+  const balance = data?.balance?.toFixed(2) ?? "0.00";
   const recentTx = transactions.slice(-5).reverse();
-  // If it returned oldest-first, use:
-  // const recentTx = transactions.slice(-5).reverse();
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.background}>
@@ -61,7 +61,7 @@ export default function Home() {
             size={28}
             color={colors.textPrimary}
           />
-          <Text style={styles.greeting}>Hi, John!</Text>
+          <Text style={styles.greeting}>{`Hi,${data.username}`} </Text>
           <View style={styles.headerIcons}>
             <Ionicons
               name="notifications-outline"
@@ -81,7 +81,7 @@ export default function Home() {
         <Text style={styles.screenTitle}>HOME</Text>
 
         {/* Card Carousel */}
-        <View style={{ height: 157 }}>
+        <View style={{ height: 165 }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -96,7 +96,7 @@ export default function Home() {
               source={require("../../../../assets/images/cardfajr.png")}
               style={styles.card}
             />
-            <Text style={styles.balanceLabel}>Balance:</Text>
+            <Text style={styles.balanceLabel}>{`Balance: $${balance}`}</Text>
           </ScrollView>
         </View>
 
@@ -117,11 +117,7 @@ export default function Home() {
                 activeOpacity={0.7}
                 onPress={() => router.push("/Deposit")}
               >
-                <AntDesign
-                  name="arrowdown"
-                  size={30}
-                  color={colors.textPrimary}
-                />
+                <AntDesign name="arrowdown" size={30} color="#7f86b1" />
               </TouchableOpacity>
               <Text style={styles.depowithtext}>Deposit</Text>
             </View>
@@ -131,12 +127,7 @@ export default function Home() {
                 activeOpacity={0.7}
                 onPress={() => router.push("/Withdraw")}
               >
-                <AntDesign
-                  name="arrowup"
-                  size={30}
-                  ç
-                  color={colors.textPrimary}
-                />
+                <AntDesign name="arrowup" size={30} color="#7f86b1" />
               </TouchableOpacity>
               <Text style={styles.depowithtext}>Withdraw</Text>
             </View>
@@ -172,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 24,
-    paddingTop: 10,
+    paddingTop: 0,
   },
   greeting: {
     fontSize: 18,
@@ -184,7 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   screenTitle: {
-    marginTop: 15,
+    marginTop: 10,
     marginHorizontal: 24,
     fontSize: 24,
     fontWeight: "700",
@@ -221,12 +212,12 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     width: 70,
     height: 70,
-    backgroundColor: "#AC9FBB",
+    backgroundColor: "#d3d5e4",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 35,
     borderWidth: 1,
-    borderColor: colors.textPrimary,
+    borderColor: colors.border,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -240,6 +231,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: colors.textPrimary,
     marginTop: 5,
+    marginBottom: 10,
   },
   center: {
     flex: 1,

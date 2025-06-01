@@ -1,9 +1,11 @@
 import { getUserId } from "@/api/auth";
 import { transfer } from "@/api/transaction";
+import colors from "@/types/colors";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
+  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -48,6 +50,10 @@ const UserTransferScreen = () => {
           <Text style={styles.loadingText}>Loading user data...</Text>
         ) : (
           <>
+            <Image
+              source={require("../../../../assets/images/transfer.png")}
+              style={{ height: 190, width: 200 }}
+            />
             <Text style={styles.username}>{data?.username}</Text>
             <Text style={styles.balance}>
               Balance: ${data?.balance?.toFixed(2)}
@@ -108,22 +114,22 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#f4f4f6",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 12,
     borderRadius: 8,
     fontSize: 18,
-    color: "#333",
     marginBottom: 24,
+    alignSelf: "center",
     width: "70%",
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
   button: {
-    backgroundColor: "#1e90ff",
+    backgroundColor: "#7f86b1",
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
     width: "70%",
+    marginBottom: 140,
   },
   buttonText: {
     color: "#fff",

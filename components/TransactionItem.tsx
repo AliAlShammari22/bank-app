@@ -14,10 +14,10 @@ function TransactionItem({ transaction }: { transaction: Transaction }) {
       : "#2196f3";
 
   return (
-    <View style={[styles.row, { borderLeftColor: color }]}>
+    <View style={[styles.row, { borderLeftColor: "" }]}>
       <View style={styles.info}>
         <Text style={styles.type}>{type.toUpperCase()}</Text>
-        <Text style={styles.date}>{date}</Text>
+        <Text style={[styles.date, styles.datecolor]}>{date}</Text>
       </View>
       <Text style={[styles.amount, { color }]}>
         {type === "withdraw" ? "-" : "+"}${amount.toFixed(2)}
@@ -41,24 +41,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     marginBottom: 8,
-    backgroundColor: "#AC9FBB",
+    backgroundColor: "#d3d5e4",
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 8,
+    borderRadius: 10,
     borderLeftWidth: 4,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    // shadowColor: "#000",
+    // shadowOpacity: 0.1,
+    // shadowRadius: 3,
+    // elevation: 2,
   },
   info: {},
   type: {
     fontSize: 16,
     fontWeight: "600",
+    color: colors.textPrimary,
   },
   date: {
     fontSize: 12,
     color: "#666",
+  },
+  datecolor: {
+    color: "#363a56",
   },
   amount: {
     fontSize: 16,
