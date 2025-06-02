@@ -1,7 +1,8 @@
-// app/register.jsx
+// app/Register.jsx
 import { register } from "@/api/auth";
 import AuthContext from "@/context/AuthContext";
 import { useThemeContext } from "@/theme/ThemeProvidor";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Link, useRouter } from "expo-router";
@@ -21,16 +22,16 @@ export default function Register() {
   const { theme } = useThemeContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const { setIsAuthenticated } = useContext(AuthContext);
   const router = useRouter();
 
-  const { mutate } = useMutation({
-    mutationKey: ["Register"],
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["register"],
     mutationFn: () =>
       register(
         { username, password },
-        image ||
+        imageUri ||
           "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
       ),
     onSuccess: () => {
@@ -45,30 +46,25 @@ export default function Register() {
 
   const handleRegister = () => {
     if (!username.trim() || !password.trim()) {
-      if (!username.trim() && !password.trim()) {
-        alert("Please enter your username and password");
-      } else if (!username.trim()) {
-        alert("Please enter your username");
-      } else {
-        alert("Please enter your password");
-      }
+      alert("Please enter both username and password");
       return;
     }
     if (password.length < 8) {
-      return alert("Please enter more than 8 characters");
+      alert("Password must be at least 8 characters");
+      return;
     }
     mutate();
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      aspect: [1, 1],
+      quality: 0.8,
     });
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImageUri(result.assets[0].uri);
     }
   };
 
@@ -80,74 +76,120 @@ export default function Register() {
       <View style={styles.container}>
         <View
           style={[
-            styles.formContainer,
-            { backgroundColor: theme.cardBackground },
+            styles.card,
+            {
+              backgroundColor: theme.cardBackground,
+              shadowColor: theme.border,
+            },
           ]}
         >
+          {/* Back button at top-left */}
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <MaterialIcons
+              name="arrow-back-ios"
+              size={24}
+              color={theme.textPrimary}
+            />
+            <Text style={[styles.backText, { color: theme.textPrimary }]}>
+              Back
+            </Text>
+          </TouchableOpacity>
+
+          {/* Heading */}
           <Text style={[styles.headerText, { color: theme.textPrimary }]}>
-            Register Your Account
+            Create Your Account
           </Text>
 
-          {image && (
+          {/* Optional Profile Image Preview */}
+          {imageUri && (
             <Image
-              source={{ uri: image }}
-              style={[styles.profileImage, { borderColor: theme.textPrimary }]}
+              source={{ uri: imageUri }}
+              style={[styles.profileImage, { borderColor: theme.accent }]}
             />
           )}
 
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.inputBackground,
-                borderColor: theme.border,
-                color: theme.textPrimary,
-              },
-            ]}
-            placeholder="Username"
-            placeholderTextColor={theme.placeholder}
-            onChangeText={setUsername}
-          />
+          {/* Username Input */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: theme.textSecondary }]}>
+              Username
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.inputBackground,
+                  borderColor: theme.border,
+                  color: theme.textPrimary,
+                },
+              ]}
+              placeholder="Enter a username"
+              placeholderTextColor={theme.placeholder}
+              autoCapitalize="none"
+              onChangeText={setUsername}
+              value={username}
+            />
+          </View>
 
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.inputBackground,
-                borderColor: theme.border,
-                color: theme.textPrimary,
-              },
-            ]}
-            placeholder="Password"
-            placeholderTextColor={theme.placeholder}
-            secureTextEntry
-            onChangeText={setPassword}
-          />
+          {/* Password Input */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: theme.textSecondary }]}>
+              Password
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.inputBackground,
+                  borderColor: theme.border,
+                  color: theme.textPrimary,
+                },
+              ]}
+              placeholder="At least 8 characters"
+              placeholderTextColor={theme.placeholder}
+              secureTextEntry
+              onChangeText={setPassword}
+              value={password}
+            />
+          </View>
 
+          {/* Register Button */}
           <TouchableOpacity
             onPress={handleRegister}
-            style={[styles.button, { backgroundColor: theme.accent }]}
+            style={[
+              styles.primaryButton,
+              { backgroundColor: theme.accent },
+              isPending && styles.buttonDisabled,
+            ]}
+            disabled={isPending}
           >
             <Text style={[styles.buttonText, { color: theme.textPrimary }]}>
-              Register
+              {isPending ? "Creating..." : "Register"}
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={pickImage}>
-            <Text style={[styles.photoText, { color: theme.textSecondary }]}>
-              Choose a Profile Photo
+          {/* Choose Profile Photo */}
+          <TouchableOpacity onPress={pickImage} style={styles.photoButton}>
+            <Text style={[styles.photoText, { color: theme.accent }]}>
+              {imageUri ? "Change Profile Photo" : "Choose Profile Photo"}
             </Text>
           </TouchableOpacity>
 
-          <Text style={[styles.linkContainer, { color: theme.textSecondary }]}>
-            Already have an account?{" "}
-            <Link
-              href="/Login"
-              style={[styles.linkText, { color: theme.accent }]}
-            >
-              Login
+          {/* Link to Login */}
+          <View style={styles.signInContainer}>
+            <Text style={[styles.signInText, { color: theme.textSecondary }]}>
+              Already have an account?{" "}
+            </Text>
+            <Link href="/Login" asChild>
+              <TouchableOpacity>
+                <Text style={[styles.signInLink, { color: theme.accent }]}>
+                  Sign In
+                </Text>
+              </TouchableOpacity>
             </Link>
-          </Text>
+          </View>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -160,64 +202,110 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    padding: 20,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
-  formContainer: {
+
+  // CARD
+  card: {
     width: "100%",
-    maxWidth: 350,
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
+    maxWidth: 360,
+    borderRadius: 12,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+    position: "relative",
   },
+
+  // BACK BUTTON
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
+    top: 16,
+    left: 16,
+  },
+  backText: {
+    fontSize: 16,
+    marginLeft: 4,
+  },
+
+  // HEADING
   headerText: {
-    fontSize: 22,
-    fontWeight: "600",
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: "700",
     textAlign: "center",
+    marginBottom: 16,
+    marginTop: 40, // push down so it doesn’t overlap the back button
   },
+
+  // PROFILE IMAGE PREVIEW
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 16,
     borderWidth: 2,
+  },
+
+  // INPUT GROUP
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 6,
   },
   input: {
     height: 45,
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    paddingHorizontal: 12,
   },
-  button: {
-    paddingVertical: 12,
+
+  // REGISTER BUTTON
+  primaryButton: {
+    height: 48,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
+    justifyContent: "center",
+    marginTop: 8,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "600",
+  },
+
+  // CHOOSE PHOTO LINK
+  photoButton: {
+    marginTop: 16,
+    alignItems: "center",
   },
   photoText: {
-    marginTop: 15,
-    textAlign: "center",
+    fontSize: 14,
     fontWeight: "500",
     textDecorationLine: "underline",
   },
-  linkContainer: {
+
+  // SIGN-IN LINK
+  signInContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
-    fontSize: 16,
-    textAlign: "center",
   },
-  linkText: {
-    fontWeight: "bold",
+  signInText: {
+    fontSize: 14,
+  },
+  signInLink: {
+    fontSize: 14,
+    fontWeight: "600",
     textDecorationLine: "underline",
   },
 });

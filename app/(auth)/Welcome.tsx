@@ -25,12 +25,12 @@ const Welcome = () => {
           onPress={() => router.push("/Login")}
           style={styles.login}
         >
-          <Text style={styles.loginText}>Login</Text>
+          <Text style={styles.loginText}>Sign In</Text>
         </TouchableOpacity>
       </View>
       <View style={{ alignItems: "center" }}>
         <Image
-          source={require("../../assets/images/finova.png")}
+          source={require("../../assets/images/tharwa.png")}
           style={{ height: 190, width: 200, alignItems: "center" }}
         />
       </View>
@@ -51,7 +51,7 @@ const Welcome = () => {
             onPress={() => router.push("/Register")}
             style={styles.register}
           >
-            <Text style={styles.registerText}>Register</Text>
+            <Text style={styles.registerText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
         {/* <Image
