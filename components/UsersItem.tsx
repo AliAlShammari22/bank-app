@@ -1,4 +1,5 @@
-import colors from "@/types/colors";
+// components/UsersItem.jsx
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -9,32 +10,50 @@ export interface UsersProps {
   balance: number;
   image: string;
 }
+
 const UsersItem = ({ _id, username, balance, image }: UsersProps) => {
   const router = useRouter();
+  const { theme } = useThemeContext();
+
+  const displayBalance =
+    balance > 1_000_000
+      ? "He is a millionaire!"
+      : `$${Math.max(balance, 0).toFixed(2)} KD`;
 
   return (
-    <View style={[styles.row, { borderLeftColor: colors.border }]}>
+    <View
+      style={[
+        styles.row,
+        {
+          backgroundColor: theme.cardBackground,
+          borderColor: theme.border,
+          borderLeftColor: theme.accent,
+        },
+      ]}
+    >
       <Image
-        style={styles.image}
+        style={[styles.image, { backgroundColor: theme.inputBackground }]}
         source={{
           uri: image
             ? `https://react-bank-project.eapi.joincoded.com/${image}`
-            : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+            : "https://gimgs2.nohat.cc/thumb/f/640/male-face-icon-default-profile-image--c3f2c592f9.jpg",
         }}
       />
       <View style={styles.info}>
-        <Text style={styles.username}>{username}</Text>
-        <Text style={styles.balance}>
-          {balance > 1_000_000
-            ? "He is a millionaire!"
-            : `$${balance.toFixed(2)}`}
+        <Text style={[styles.username, { color: theme.textPrimary }]}>
+          {username}
+        </Text>
+        <Text style={[styles.balance, { color: theme.textSecondary }]}>
+          {displayBalance}
         </Text>
       </View>
       <TouchableOpacity
         onPress={() => router.push(`/${_id}`)}
-        style={styles.transferButton}
+        style={[styles.transferButton, { backgroundColor: theme.accent }]}
       >
-        <Text style={styles.transferText}>Transfer</Text>
+        <Text style={[styles.transferText, { color: theme.textPrimary }]}>
+          Transfer
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -48,15 +67,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     marginBottom: 8,
-    backgroundColor: "#d3d5e4",
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 8,
     borderLeftWidth: 4,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
   image: {
     width: 50,
@@ -73,17 +91,14 @@ const styles = StyleSheet.create({
   },
   balance: {
     fontSize: 12,
-    color: "#363a56",
     marginTop: 4,
   },
   transferButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#5f6898",
     borderRadius: 6,
   },
   transferText: {
-    color: "#fff",
     fontWeight: "600",
   },
 });

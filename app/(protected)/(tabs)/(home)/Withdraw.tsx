@@ -1,5 +1,6 @@
+// app/Withdraw.jsx
 import { withdraw } from "@/api/transaction";
-import colors from "@/types/colors";
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 
 export default function Withdraw() {
+  const { theme } = useThemeContext();
   const [amountText, setAmountText] = useState("");
 
   const withdrawMutation = useMutation({
@@ -28,26 +30,46 @@ export default function Withdraw() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <View style={styles.container}>
         <Image
           source={require("../../../../assets/images/withdraw.png")}
-          style={{ height: 190, width: 200 }}
+          style={styles.image}
         />
-        <Text style={styles.title}>Withdraw Funds</Text>
+
+        <Text style={[styles.title, { color: theme.textPrimary }]}>
+          Withdraw Funds
+        </Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.inputBackground,
+              borderColor: theme.border,
+              color: theme.textPrimary,
+            },
+          ]}
           placeholder="Enter amount"
+          placeholderTextColor={theme.textSecondary}
           keyboardType="number-pad"
           value={amountText}
           onChangeText={setAmountText}
-          placeholderTextColor="#888"
           returnKeyType="done"
         />
 
-        <TouchableOpacity style={styles.withdraw} onPress={handleWithdraw}>
-          <Text style={styles.buttonText}>Withdraw</Text>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: theme.accent },
+            withdrawMutation.isPending && styles.buttonDisabled,
+          ]}
+          onPress={handleWithdraw}
+          disabled={withdrawMutation.isPending}
+        >
+          <Text style={[styles.buttonText, { color: theme.textPrimary }]}>
+            {withdrawMutation.isPending ? "Withdrawing..." : "Withdraw"}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -57,44 +79,43 @@ export default function Withdraw() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
-    padding: 24,
+    padding: 20,
     justifyContent: "center",
     alignItems: "center",
   },
+  image: {
+    width: 200,
+    height: 190,
+    marginBottom: 30,
+  },
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: 32,
-    color: colors.textPrimary,
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 20,
   },
   input: {
-    backgroundColor: "#f4f4f6",
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 18,
-    marginBottom: 24,
-    alignSelf: "center",
     width: "70%",
+    height: 45,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 24,
   },
-  withdraw: {
-    backgroundColor: "#7f86b1",
-    padding: 14,
+  button: {
+    width: "50%",
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
-    alignSelf: "center",
-    width: "50%",
-    marginBottom: 150,
+    marginBottom: 190,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
   },
   buttonText: {
-    color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
   },
 });

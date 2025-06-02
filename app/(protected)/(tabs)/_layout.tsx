@@ -1,33 +1,35 @@
-import colors from "@/types/colors";
+// app/_layout.jsx (or wherever your TabLayout resides)
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { MaterialIcons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Tabs } from "expo-router";
 import React from "react";
 import { StyleSheet } from "react-native";
+
 const TabLayout = () => {
+  const { theme } = useThemeContext();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.background,
+          backgroundColor: theme.background,
           borderWidth: 0,
-          // borderTopColor: "#AC9FBB",
           height: 70,
           paddingBottom: 0,
           borderRadius: 0,
-          borderColor: "#444040",
+          borderColor: theme.border,
           marginBottom: 0,
         },
-        tabBarActiveTintColor: "#F16F0D",
-        tabBarInactiveTintColor: colors.textPrimary,
+        tabBarActiveTintColor: theme.accent,
+        tabBarInactiveTintColor: theme.textPrimary,
       }}
     >
       <Tabs.Screen
         name="(home)"
         options={{
           title: "Finance",
-
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" color={color} size={size} />
           ),
@@ -36,7 +38,6 @@ const TabLayout = () => {
       <Tabs.Screen
         name="(transactions)"
         options={{
-          headerShown: false,
           title: "Transactions",
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="compare-arrows" size={size} color={color} />
@@ -52,15 +53,6 @@ const TabLayout = () => {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="(xcards)"
-        options={{
-          title: "Cards",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome6 name="credit-card" size={size} color={color} />
-          ),
-        }}
-      /> */}
       <Tabs.Screen
         name="(profile)"
         options={{

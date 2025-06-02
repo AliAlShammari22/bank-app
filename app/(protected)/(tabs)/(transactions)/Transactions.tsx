@@ -1,9 +1,11 @@
+// app/Transactions.jsx
 import { getMyTransaction } from "@/api/transaction";
 import TransactionItem from "@/components/TransactionItem";
-import colors from "@/types/colors";
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { Transaction } from "@/types/Transactions";
+import { useScrollToTop } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -16,6 +18,10 @@ import { Searchbar } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Transactions() {
+  const { theme } = useThemeContext();
+  const ref = useRef<FlatList>(null);
+
+  useScrollToTop(ref);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<null | Transaction["type"]>(
     null
@@ -47,40 +53,39 @@ export default function Transactions() {
 
   if (isLoading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.textPrimary} />
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.textPrimary} />
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.error}>Failed to load: {error.message}</Text>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <Text style={[styles.error, { color: theme.accent }]}>
+          Failed to load: {error.message}
+        </Text>
       </View>
     );
   }
 
   return (
     <SafeAreaView
-      style={[styles.safe, { backgroundColor: colors.background }]}
+      style={[styles.safe, { backgroundColor: theme.background }]}
       edges={["top"]}
     >
       {/* Search Bar */}
       <Searchbar
-        returnKeyType="done"
-        placeholder="Search"
+        placeholder="Search by date or amount"
         onChangeText={setSearchQuery}
         value={searchQuery}
-        iconColor="#64748B"
-        placeholderTextColor="#64748B"
-        inputStyle={{ color: colors.primary }}
-        style={{
-          marginHorizontal: 10,
-          borderColor: colors.border,
-          borderWidth: 1,
-          backgroundColor: "#fff",
-        }}
+        iconColor={theme.accent}
+        placeholderTextColor={theme.textSecondary}
+        inputStyle={[styles.searchInput, { color: theme.textPrimary }]}
+        style={[
+          styles.searchbar,
+          { backgroundColor: theme.inputBackground, borderColor: theme.border },
+        ]}
       />
 
       {/* Type Filter Buttons */}
@@ -92,13 +97,22 @@ export default function Transactions() {
         ).map((t) => (
           <TouchableOpacity
             key={String(t)}
-            style={[styles.typeBtn, typeFilter === t && styles.typeBtnActive]}
+            style={[
+              styles.typeBtn,
+              { borderColor: theme.textPrimary },
+              typeFilter === t && {
+                backgroundColor: theme.accent,
+              },
+            ]}
             onPress={() => setTypeFilter(t)}
           >
             <Text
               style={[
                 styles.typeText,
-                typeFilter === t && styles.typeTextActive,
+                {
+                  color:
+                    typeFilter === t ? theme.background : theme.textPrimary,
+                },
               ]}
             >
               {t === null ? "All" : t.charAt(0).toUpperCase() + t.slice(1)}
@@ -109,21 +123,41 @@ export default function Transactions() {
 
       {/* Transactions List */}
       <FlatList
-        data={filtered}
+        ref={ref}
+        data={filtered.reverse()}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => <TransactionItem transaction={item} />}
-        ListEmptyComponent={<Text style={styles.empty}>No transactions</Text>}
+        ListEmptyComponent={
+          <Text style={[styles.empty, { color: theme.textSecondary }]}>
+            No transactions
+          </Text>
+        }
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  error: { color: "red" },
-
+  safe: {
+    flex: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  error: {
+    marginTop: 20,
+  },
+  // Searchbar container
+  searchbar: {
+    margin: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  // Text inside Searchbar
+  searchInput: {},
   typeContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -133,20 +167,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: colors.textPrimary,
     borderRadius: 20,
   },
-  typeBtnActive: {
-    backgroundColor: "#F16F0D",
-    color: colors.textPrimary,
+  typeText: {
+    fontSize: 12,
   },
-  typeText: { color: colors.textPrimary, fontSize: 12 },
-  typeTextActive: { color: colors.white },
-
-  list: { padding: 16 },
+  list: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
   empty: {
     textAlign: "center",
     marginTop: 24,
-    color: colors.textSecondary,
   },
 });

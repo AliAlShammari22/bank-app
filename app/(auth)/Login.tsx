@@ -1,6 +1,7 @@
-// app/index.jsx
+// app/Login.jsx
 import { login } from "@/api/auth";
 import AuthContext from "@/context/AuthContext";
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
@@ -14,14 +15,17 @@ import {
   View,
 } from "react-native";
 
+// If you used ThemeProvider above:
+
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { setIsAuthenticated } = useContext(AuthContext);
   const router = useRouter();
+  const { theme, setMode, mode } = useThemeContext();
 
   const { mutate } = useMutation({
-    mutationKey: ["Login"],
+    mutationKey: ["login"],
     mutationFn: () => login({ username, password }),
     onSuccess: () => {
       setIsAuthenticated(true);
@@ -35,13 +39,7 @@ export default function Login() {
 
   const validateAndLogin = () => {
     if (!username.trim() || !password.trim()) {
-      if (!username.trim() && !password.trim()) {
-        alert("Please enter your username and password");
-      } else if (!username.trim()) {
-        alert("Please enter your username");
-      } else {
-        alert("Please enter your password");
-      }
+      alert("Please enter both username and password");
       return;
     }
     mutate();
@@ -50,33 +48,63 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.keyboardView}
+      style={[styles.keyboardView, { backgroundColor: theme.background }]}
     >
-      <View style={styles.container}>
-        <View style={styles.formContainer}>
-          <Text style={styles.headerText}>Login to Your Account</Text>
+      <View style={[styles.container]}>
+        <View
+          style={[
+            styles.formContainer,
+            { backgroundColor: theme.cardBackground },
+          ]}
+        >
+          <Text style={[styles.headerText, { color: theme.textPrimary }]}>
+            Login to Your Account
+          </Text>
+
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.border,
+                color: theme.textPrimary,
+              },
+            ]}
             placeholder="Username"
-            placeholderTextColor="#777"
-            keyboardType="default"
-            returnKeyType="done"
+            placeholderTextColor={theme.placeholder}
             onChangeText={setUsername}
           />
+
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.border,
+                color: theme.textPrimary,
+              },
+            ]}
             placeholder="Password"
-            placeholderTextColor="#777"
+            placeholderTextColor={theme.placeholder}
             secureTextEntry
-            returnKeyType="done"
             onChangeText={setPassword}
           />
-          <TouchableOpacity onPress={validateAndLogin} style={styles.button}>
-            <Text style={styles.buttonText}>Login</Text>
+
+          <TouchableOpacity
+            onPress={validateAndLogin}
+            style={[styles.button, { backgroundColor: theme.accent }]}
+          >
+            <Text style={[styles.buttonText, { color: theme.textPrimary }]}>
+              Login
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.linkContainer}>
+
+          <Text style={[styles.linkContainer, { color: theme.textSecondary }]}>
             Don't have an account?{" "}
-            <Link href="/Register" style={styles.linkText}>
+            <Link
+              href="/Register"
+              style={[styles.linkText, { color: theme.accent }]}
+            >
               Register
             </Link>
           </Text>
@@ -89,7 +117,6 @@ export default function Login() {
 const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: "#f0f2f5",
   },
   container: {
     flex: 1,
@@ -100,7 +127,6 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "100%",
     maxWidth: 350,
-    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     shadowColor: "#000",
@@ -112,29 +138,23 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 22,
     fontWeight: "600",
-    color: "#333",
     marginBottom: 20,
     textAlign: "center",
   },
   input: {
     height: 45,
-    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
-    backgroundColor: "#fff",
-    color: "#333",
   },
   button: {
-    backgroundColor: "#1e90ff",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
@@ -142,11 +162,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     textAlign: "center",
-    color: "#333",
   },
   linkText: {
-    color: "#1e90ff",
     fontWeight: "bold",
     textDecorationLine: "underline",
+  },
+  toggleButton: {
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 6,
+    alignSelf: "center",
   },
 });

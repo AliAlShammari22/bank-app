@@ -1,9 +1,12 @@
+// app/Profile.jsx
 import { me, updateProfile } from "@/api/auth";
 import { deleteToken } from "@/api/storage";
 import AuthContext from "@/context/AuthContext";
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,20 +15,25 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
 export default function Profile() {
+  const { theme, mode, setMode } = useThemeContext();
   const { setIsAuthenticated } = useContext(AuthContext);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const router = useRouter();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["profile"],
     queryFn: me,
   });
 
-  const { mutate } = useMutation({
+  const updateMutation = useMutation({
     mutationKey: ["updateProfile"],
     mutationFn: () => updateProfile(imageUri || ""),
     onSuccess: () => Alert.alert("Profile image updated!"),
@@ -37,7 +45,7 @@ export default function Profile() {
       Alert.alert("Please choose an image first");
       return;
     }
-    mutate();
+    updateMutation.mutate();
   };
 
   const pickImage = async () => {
@@ -52,29 +60,12 @@ export default function Profile() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#7f86b1" />
-      </View>
-    );
-  }
-  if (error) {
-    return (
-      <View style={styles.loader}>
-        <Text style={styles.errorText}>Failed to load profile.</Text>
-      </View>
-    );
-  }
   const handleLogout = () => {
     Alert.alert(
       "Confirm Logout",
       "Are you sure you want to log out?",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Yes",
           style: "destructive",
@@ -88,36 +79,135 @@ export default function Profile() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <View style={[styles.loader, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.textPrimary} />
+      </View>
+    );
+  }
+  if (error) {
+    return (
+      <View style={[styles.loader, { backgroundColor: theme.background }]}>
+        <Text style={[styles.errorText, { color: theme.textPrimary }]}>
+          Failed to load profile.
+        </Text>
+      </View>
+    );
+  }
+
   const username = data?.username ?? "User";
   const balance = data?.balance?.toFixed(2) ?? "0.00";
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Greeting */}
-        <View
-          style={{
-            width: "100%",
-            justifyContent: "flex-end",
-            flexDirection: "row",
-          }}
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+      {/* Side Menu Overlay */}
+      {menuVisible && (
+        <TouchableOpacity
+          style={styles.backdrop}
+          activeOpacity={1}
+          onPress={() => setMenuVisible(false)}
         >
-          <TouchableOpacity
-            onPress={handleLogout}
-            style={{ flexDirection: "row", alignItems: "center" }}
+          <View />
+        </TouchableOpacity>
+      )}
+      <View style={styles.menuContainer}>
+        {menuVisible && (
+          <View
+            style={[styles.sideMenu, { backgroundColor: theme.cardBackground }]}
           >
-            <Text style={{}}>Logout </Text>
-            <MaterialCommunityIcons name="logout" size={24} color="black" />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                router.replace("/");
+              }}
+            >
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>
+                Home
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                router.replace("/Transactions");
+              }}
+            >
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>
+                Transactions
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                router.replace("/Users");
+              }}
+            >
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>
+                Users
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                handleLogout();
+              }}
+            >
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>
+                Logout
+              </Text>
+            </TouchableOpacity>
+
+            {/* Dark/Light Mode Switch */}
+            <View style={styles.switchContainer}>
+              <Text style={[styles.switchLabel, { color: theme.textPrimary }]}>
+                {mode === "dark" ? "Dark Mode" : "Light Mode"}
+              </Text>
+              <Switch
+                value={mode === "dark"}
+                onValueChange={() =>
+                  setMode(mode === "dark" ? "light" : "dark")
+                }
+                trackColor={{
+                  false: theme.border,
+                  true: theme.accent,
+                }}
+                thumbColor={theme.textPrimary}
+              />
+            </View>
+          </View>
+        )}
+      </View>
+
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Header with Hamburger */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => setMenuVisible(true)}>
+            <MaterialCommunityIcons
+              name="menu"
+              size={28}
+              color={theme.textPrimary}
+            />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.greeting}>
-          Hello, <Text style={styles.username}>{username}</Text> 👋
+        {/* Greeting */}
+        <Text style={[styles.greeting, { color: theme.textPrimary }]}>
+          Hello,{" "}
+          <Text style={[styles.username, { color: theme.accent }]}>
+            {username}
+          </Text>{" "}
+          👋
         </Text>
-        <Text style={styles.subtext}>Welcome to your profile</Text>
+        <Text style={[styles.subtext, { color: theme.textSecondary }]}>
+          Welcome to your profile
+        </Text>
 
         {/* Avatar */}
-        <View style={styles.avatarContainer}>
+        <View style={[styles.avatarContainer, { borderColor: theme.accent }]}>
           <Image
             source={{
               uri: imageUri
@@ -131,23 +221,56 @@ export default function Profile() {
         {/* Update Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.pickButton]}
+            style={[
+              styles.actionButton,
+              styles.pickButton,
+              {
+                backgroundColor: theme.cardBackground,
+                borderColor: theme.border,
+              },
+            ]}
             onPress={pickImage}
+            disabled={updateMutation.isPending}
           >
-            <Text style={styles.actionTextChoose}>Choose Photo</Text>
+            <Text style={[styles.pickText, { color: theme.textPrimary }]}>
+              Choose Photo
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, styles.uploadButton]}
+            style={[
+              styles.actionButton,
+              styles.uploadButton,
+              { backgroundColor: theme.accent },
+            ]}
             onPress={handleUpdate}
+            disabled={updateMutation.isPending}
           >
-            <Text style={styles.actionText}>Update</Text>
+            {updateMutation.isPending ? (
+              <ActivityIndicator color={theme.textPrimary} />
+            ) : (
+              <Text style={[styles.uploadText, { color: theme.textPrimary }]}>
+                Update
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
 
         {/* Balance Card */}
-        <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Current Balance</Text>
-          <Text style={styles.balanceValue}>${balance}</Text>
+        <View
+          style={[
+            styles.balanceCard,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
+        >
+          <Text style={[styles.balanceLabel, { color: theme.accent }]}>
+            Current Balance
+          </Text>
+          <Text style={[styles.balanceValue, { color: theme.accent }]}>
+            {balance} KD
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -157,11 +280,6 @@ export default function Profile() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#f5f5f8", // very light gray for subtle contrast
-  },
-  container: {
-    alignItems: "center",
-    paddingVertical: 24,
   },
   loader: {
     flex: 1,
@@ -169,26 +287,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   errorText: {
-    color: "#D00",
     fontSize: 16,
+  },
+  container: {
+    alignItems: "center",
+    paddingVertical: 24,
+  },
+  header: {
+    width: "100%",
+    paddingHorizontal: 24,
+    alignItems: "flex-start",
   },
   greeting: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#333333", // dark gray for primary text
   },
   username: {
     fontWeight: "700",
-    color: "#7f86b1", // accent color
   },
   subtext: {
     fontSize: 16,
-    color: "#555555",
     marginBottom: 24,
   },
   avatarContainer: {
     borderWidth: 2,
-    borderColor: "#7f86b1",
     borderRadius: 80,
     padding: 4,
     marginBottom: 16,
@@ -197,7 +319,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#e0e0e0", // placeholder gray while loading
+    backgroundColor: "#4E4A4A", // placeholder gray when loading
   },
   buttonRow: {
     flexDirection: "row",
@@ -210,45 +332,80 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   pickButton: {
-    backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "#7f86b1",
   },
-  uploadButton: {
-    backgroundColor: "#7f86b1",
-  },
-  actionText: {
+  uploadButton: {},
+  pickText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#ffffff",
   },
-  actionTextChoose: {
+  uploadText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#7f86b1",
   },
   balanceCard: {
-    backgroundColor: "#ffffff",
     width: "90%",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 32,
-    // subtle shadow for depth
+    borderWidth: 1,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 4,
   },
   balanceLabel: {
     fontSize: 16,
-    color: "#777777",
     marginBottom: 8,
   },
   balanceValue: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#7f86b1",
+  },
+
+  // Side menu
+  menuContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+  sideMenu: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 250,
+    height: "100%",
+    paddingTop: 60,
+    paddingHorizontal: 16,
+    zIndex: 2,
+  },
+  menuItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  menuText: {
+    fontSize: 18,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  switchLabel: {
+    fontSize: 16,
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 250,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 1,
   },
 });

@@ -1,5 +1,6 @@
 import { getToken } from "@/api/storage";
 import AuthContext from "@/context/AuthContext";
+import { ThemeProvider } from "@/theme/ThemeProvidor";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
@@ -44,16 +45,18 @@ export default function RootLayout() {
         style={{ flex: 1, backgroundColor: "#fcfdff" }}
         edges={["top"]}
       > */}
-      <QueryClientProvider client={queryClient}>
-        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(protected)" />
-          </Stack>
-        </AuthContext.Provider>
-      </QueryClientProvider>
-      <StatusBar barStyle={"default"} />
-      {/* </SafeAreaView> */}
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(protected)" />
+            </Stack>
+          </AuthContext.Provider>
+        </QueryClientProvider>
+        <StatusBar barStyle={"default"} />
+        {/* </SafeAreaView> */}
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

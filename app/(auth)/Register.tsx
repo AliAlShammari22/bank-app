@@ -1,6 +1,7 @@
 // app/register.jsx
 import { register } from "@/api/auth";
 import AuthContext from "@/context/AuthContext";
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Link, useRouter } from "expo-router";
@@ -17,6 +18,7 @@ import {
 } from "react-native";
 
 export default function Register() {
+  const { theme } = useThemeContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [image, setImage] = useState<string | null>(null);
@@ -36,9 +38,8 @@ export default function Register() {
       router.replace("/");
       alert("Registered successfully!");
     },
-    onError: (error) => {
+    onError: () => {
       alert("Registration failed. Please try again.");
-      console.log(error);
     },
   });
 
@@ -54,7 +55,7 @@ export default function Register() {
       return;
     }
     if (password.length < 8) {
-      return alert("Please enter more than 8 charcheters");
+      return alert("Please enter more than 8 characters");
     }
     mutate();
   };
@@ -66,9 +67,6 @@ export default function Register() {
       aspect: [4, 3],
       quality: 1,
     });
-
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
@@ -77,36 +75,76 @@ export default function Register() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.keyboardView}
+      style={[styles.keyboardView, { backgroundColor: theme.background }]}
     >
       <View style={styles.container}>
-        <View style={styles.formContainer}>
-          <Text style={styles.headerText}>Register Your Account</Text>
+        <View
+          style={[
+            styles.formContainer,
+            { backgroundColor: theme.cardBackground },
+          ]}
+        >
+          <Text style={[styles.headerText, { color: theme.textPrimary }]}>
+            Register Your Account
+          </Text>
+
           {image && (
-            <Image source={{ uri: image }} style={styles.profileImage} />
+            <Image
+              source={{ uri: image }}
+              style={[styles.profileImage, { borderColor: theme.textPrimary }]}
+            />
           )}
+
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.border,
+                color: theme.textPrimary,
+              },
+            ]}
             placeholder="Username"
-            placeholderTextColor="#777"
+            placeholderTextColor={theme.placeholder}
             onChangeText={setUsername}
           />
+
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.border,
+                color: theme.textPrimary,
+              },
+            ]}
             placeholder="Password"
-            placeholderTextColor="#777"
+            placeholderTextColor={theme.placeholder}
             secureTextEntry
             onChangeText={setPassword}
           />
-          <TouchableOpacity onPress={handleRegister} style={styles.button}>
-            <Text style={styles.buttonText}>Register</Text>
+
+          <TouchableOpacity
+            onPress={handleRegister}
+            style={[styles.button, { backgroundColor: theme.accent }]}
+          >
+            <Text style={[styles.buttonText, { color: theme.textPrimary }]}>
+              Register
+            </Text>
           </TouchableOpacity>
+
           <TouchableOpacity onPress={pickImage}>
-            <Text style={styles.photoText}>Choose a Profile Photo</Text>
+            <Text style={[styles.photoText, { color: theme.textSecondary }]}>
+              Choose a Profile Photo
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.linkContainer}>
+
+          <Text style={[styles.linkContainer, { color: theme.textSecondary }]}>
             Already have an account?{" "}
-            <Link href="/Login" style={styles.linkText}>
+            <Link
+              href="/Login"
+              style={[styles.linkText, { color: theme.accent }]}
+            >
               Login
             </Link>
           </Text>
@@ -119,7 +157,6 @@ export default function Register() {
 const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: "#f0f2f5",
   },
   container: {
     flex: 1,
@@ -130,7 +167,6 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "100%",
     maxWidth: 350,
-    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     shadowColor: "#000",
@@ -144,40 +180,34 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 20,
     textAlign: "center",
-    color: "#333",
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
     marginBottom: 20,
+    borderWidth: 2,
   },
   input: {
     height: 45,
-    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
-    backgroundColor: "#fff",
-    color: "#333",
   },
   button: {
-    backgroundColor: "#1e90ff",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
   photoText: {
     marginTop: 15,
     textAlign: "center",
-    color: "#1e90ff",
     fontWeight: "500",
     textDecorationLine: "underline",
   },
@@ -185,10 +215,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     textAlign: "center",
-    color: "#333",
   },
   linkText: {
-    color: "#1e90ff",
     fontWeight: "bold",
     textDecorationLine: "underline",
   },

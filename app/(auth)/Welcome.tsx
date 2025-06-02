@@ -1,3 +1,4 @@
+import colors from "@/types/colors";
 import { Video } from "expo-av";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -10,7 +11,7 @@ const Welcome = () => {
     <View style={styles.container}>
       {/* ② Background video absolutely filling */}
       <Video
-        source={require("../../assets/videos/bankwelcome.mp4")}
+        source={require("../../assets/videos/welcome.mp4")}
         style={StyleSheet.absoluteFillObject}
         shouldPlay
         isLooping
@@ -80,11 +81,11 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 100,
     alignItems: "center",
-    borderColor: "#0170df",
-    backgroundColor: "#0170df",
+    borderColor: "#7C7C7C",
+    backgroundColor: "#7C7C7C",
   },
   loginText: {
-    color: "white",
+    color: colors.buttonback,
     fontSize: 17,
     fontWeight: 500,
   },
@@ -111,21 +112,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 15,
     marginRight: 10,
-    backgroundColor: "#0170df",
-    borderColor: "#0170df",
+    backgroundColor: "#7C7C7C",
+    borderColor: "#7C7C7C",
   },
   blackButtonText: {
-    color: "white",
+    color: colors.buttonback,
     fontWeight: "500" as any,
   },
   register: {
     borderWidth: 2.5,
     borderRadius: 4,
     padding: 15,
-    borderColor: "#0170df",
+    borderColor: "#7C7C7C",
   },
   registerText: {
-    color: "#0170df",
+    color: "#7C7C7C",
     fontWeight: "500" as any,
   },
 });

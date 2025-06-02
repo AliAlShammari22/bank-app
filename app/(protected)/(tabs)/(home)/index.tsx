@@ -1,7 +1,8 @@
+// app/Home.jsx
 import { me } from "@/api/auth";
 import { getMyTransaction } from "@/api/transaction";
 import TransactionItem from "@/components/TransactionItem";
-import colors from "@/types/colors";
+import { useThemeContext } from "@/theme/ThemeProvidor";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -19,6 +20,8 @@ import {
 } from "react-native";
 
 export default function Home() {
+  const { theme } = useThemeContext();
+
   const {
     data: transactions = [],
     isLoading,
@@ -35,50 +38,57 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.textPrimary} />
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.textPrimary} />
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.error}>Failed to load: {error.message}</Text>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <Text style={[styles.error, { color: theme.accent }]}>
+          Failed to load: {error.message}
+        </Text>
       </View>
     );
   }
+
   const balance = data?.balance?.toFixed(2) ?? "0.00";
-  const recentTx = transactions?.slice(-5).reverse();
+  const recentTx = transactions.slice(-5).reverse();
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.background}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+      <View style={[styles.background, { backgroundColor: theme.background }]}>
         {/* Header */}
         <View style={styles.header}>
           <Ionicons
             name="person-circle-outline"
             size={28}
-            color={colors.textPrimary}
+            color={theme.textPrimary}
           />
-          <Text style={styles.greeting}>{`Hi,${data?.username}`} </Text>
+          <Text style={[styles.greeting, { color: theme.textPrimary }]}>
+            {`Hi, ${data?.username}`}
+          </Text>
           <View style={styles.headerIcons}>
             <Ionicons
               name="notifications-outline"
               size={24}
-              color={colors.textPrimary}
+              color={theme.textPrimary}
             />
             <Ionicons
               name="help-circle-outline"
               size={24}
-              color={colors.textPrimary}
+              color={theme.textPrimary}
               style={{ marginLeft: 16 }}
             />
           </View>
         </View>
 
         {/* Screen Title */}
-        <Text style={styles.screenTitle}>HOME</Text>
+        <Text style={[styles.screenTitle, { color: theme.textPrimary }]}>
+          HOME
+        </Text>
 
         {/* Card Carousel */}
         <View style={{ height: 165 }}>
@@ -96,52 +106,59 @@ export default function Home() {
               source={require("../../../../assets/images/cardfajr.png")}
               style={styles.card}
             />
-            <Text style={styles.balanceLabel}>{`Balance: $${balance}`}</Text>
+            <Text style={[styles.balanceLabel, { color: theme.textPrimary }]}>
+              {`Balance: ${balance} KD`}
+            </Text>
           </ScrollView>
         </View>
 
-        {/* Additional content can go here */}
+        {/* Finance Buttons */}
         <View>
-          <Text style={styles.screenTitle}>Finance</Text>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 60,
-            }}
-          >
-            <View>
+          <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>
+            Finance
+          </Text>
+          <View style={styles.financeRow}>
+            <View style={styles.financeItem}>
               <TouchableOpacity
-                style={styles.button}
+                style={[
+                  styles.button,
+                  { backgroundColor: theme.accent, borderColor: theme.border },
+                ]}
                 activeOpacity={0.7}
                 onPress={() => router.push("/Deposit")}
               >
                 <AntDesign
                   name="arrowdown"
                   size={30}
-                  color={colors.textPrimary}
+                  color={theme.textPrimary}
                 />
               </TouchableOpacity>
-              <Text style={styles.depowithtext}>Deposit</Text>
+              <Text style={[styles.depowithText, { color: theme.textPrimary }]}>
+                Deposit
+              </Text>
             </View>
-            <View>
+            <View style={styles.financeItem}>
               <TouchableOpacity
-                style={styles.button}
+                style={[
+                  styles.button,
+                  { backgroundColor: theme.accent, borderColor: theme.border },
+                ]}
                 activeOpacity={0.7}
                 onPress={() => router.push("/Withdraw")}
               >
-                <AntDesign
-                  name="arrowup"
-                  size={30}
-                  color={colors.textPrimary}
-                />
+                <AntDesign name="arrowup" size={30} color={theme.textPrimary} />
               </TouchableOpacity>
-              <Text style={styles.depowithtext}>Withdraw</Text>
+              <Text style={[styles.depowithText, { color: theme.textPrimary }]}>
+                Withdraw
+              </Text>
             </View>
           </View>
         </View>
-        <Text style={styles.screenTitle}>Recent Transactions</Text>
+
+        {/* Recent Transactions */}
+        <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>
+          Recent Transactions
+        </Text>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={recentTx}
@@ -149,7 +166,9 @@ export default function Home() {
           contentContainerStyle={styles.list}
           renderItem={({ item }) => <TransactionItem transaction={item} />}
           ListEmptyComponent={
-            <Text style={styles.empty}>No recent transactions</Text>
+            <Text style={[styles.empty, { color: theme.textSecondary }]}>
+              No recent transactions
+            </Text>
           }
         />
       </View>
@@ -160,23 +179,20 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   background: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 24,
-    paddingTop: 0,
+    paddingTop: 5,
   },
   greeting: {
     fontSize: 18,
     fontWeight: "600",
-    color: colors.textPrimary,
     textAlign: "center",
   },
   headerIcons: {
@@ -187,14 +203,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     fontSize: 24,
     fontWeight: "700",
-    color: colors.textPrimary,
   },
   cardScroll: {
     marginTop: 16,
     maxHeight: 150,
   },
   card: {
-    resizeMode: "contain",
+    resizeMode: "cover",
     width: 230,
     height: 150,
     borderRadius: 12,
@@ -205,57 +220,66 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    alignItems: "center",
     marginRight: 10,
   },
   balanceLabel: {
     position: "absolute",
     top: 25,
-    left: 51,
-    color: colors.textPrimary,
+    left: 45,
     fontWeight: "500",
   },
+  sectionTitle: {
+    marginTop: 15,
+    marginHorizontal: 24,
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 5,
+  },
+  financeRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 5,
+  },
+  financeItem: {
+    alignItems: "center",
+    marginHorizontal: 30,
+  },
   button: {
-    marginTop: 13,
-    marginLeft: 20,
     width: 70,
     height: 70,
-    backgroundColor: colors.buttonback,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 35,
     borderWidth: 1,
-    borderColor: colors.border,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  depowithtext: {
+  depowithText: {
     textAlign: "center",
     width: 110,
     fontSize: 14,
     fontWeight: "500",
-    color: colors.textPrimary,
     marginTop: 5,
-    marginBottom: 10,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.background,
   },
   list: {
-    padding: 16,
-  },
-  error: {
-    color: "red",
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   empty: {
     textAlign: "center",
     marginTop: 20,
-    color: "#888",
+  },
+  error: {
+    marginTop: 20,
   },
 });
